@@ -1,0 +1,77 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Administración empresas</ui:define>
+
+	<ui:define name="head">
+
+	</ui:define>
+
+	<ui:define name="content">
+
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+				if (args.validationFailed || !args.infoCorrect) {
+					PF('dlg').jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					PF('dlg').hide();
+				}
+			}
+		</script>
+
+		<h:form>
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<p:tooltip />
+
+					<p:growl id="growl" showDetail="true" sticky="true" />
+					<p:commandButton id="newCompany_button" value="Nueva empresa"
+						icon="fa fa-bank Fs14 White" type="button"
+						onclick="PF('dlg').show()" style="max-width:150px;" />
+
+
+					<p:dialog header="Agregar empresa" widgetVar="dlg"
+						resizable="false" draggable="false" responsive="true" width="50%">
+						<p:panelGrid columns="1" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							columnClasses="ui-grid-col-4,ui-grid-col-8">
+							<p:message for="idEmpresa_input" />
+							<p:inputText id="idEmpresa_input" required="true"
+								value="#{adminEmpresas.idEmpresa}"
+								placeholder="Ingrese ID de la empresa" label="ID empresa"
+								requiredMessage="El id de la empresa no puede estar vacío"
+								style="width: 320px" />
+							<p:message for="idEmpresa_input" />
+							<p:inputText id="nombreEmpresa_input" required="true"
+								value="#{adminEmpresas.nombreEmpresa}"
+								placeholder="Ingrese nombre de la empresa" style="width: 320px"
+								requiredMessage="El nombre de la empresa no puede estar vacío" />
+							<p:message for="razonSocEmpresa_input" />
+							<p:inputText id="razonSocEmpresa_input"
+								value="#{adminEmpresas.razonSocialEmpresa}"
+								placeholder="Ingrese razón social de la empresa"
+								style="width: 320px" />
+							<p:message for="direccionEmpresa_input" />
+							<p:inputText id="direccionEmpresa_input"
+								value="#{adminEmpresas.direccionPrincipal}"
+								placeholder="Ingrese la dirección de la empresa"
+								style="width: 320px" />
+						</p:panelGrid>
+						<br />
+						<f:facet name="footer">
+							<p:commandButton value="Guardar" action="#{adminEmpresas.save}"
+								update="growl" oncomplete="handleLoginRequest(xhr, status, args)" />
+						</f:facet>
+					</p:dialog>
+
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
