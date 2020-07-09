@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Administración estados</ui:define>
+
+	<ui:define name="head">
+
+	</ui:define>
+
+	<ui:define name="content">
+
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+				console.log(args.infoCorrect);
+				if (!args.infoCorrect) {
+					PF('dlg').jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					PF('dlg').hide();
+				}
+			}
+		</script>
+
+		<style type="text/css">
+.ui-row-editor .ui-row-editor-pencil {
+	margin-left: 8px;
+}
+</style>
+
+		<h:form id="form">
+			<p:growl id="growl" life="2500" />
+
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<p:tooltip />
+
+					<p:commandButton id="newStatus_button"
+						value="Nuevo estado producto" icon="fa fa fa-cube Fs14 White"
+						type="button" onclick="PF('dlg').show()" style="max-width:150px;" />
+
+
+					<p:dialog header="Agregar estado producto" widgetVar="dlg"
+						id="dialogStatusProd" resizable="false" draggable="false"
+						responsive="true" width="400px">
+						<p:panelGrid columns="1" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							columnClasses="ui-grid-col-4,ui-grid-col-8" id="dialogGrid">
+							<p:message for="idEstadoProd_input" />
+							<p:inputText id="idEstadoProd_input" required="true"
+								value="#{adminProductStatus.idStatusProd}"
+								placeholder="Ingrese ID del nuevo estado del producto"
+								label="ID estado producto"
+								requiredMessage="El ID del nuevo estado del producto no puede estar vacío"
+								style="width: 320px" />
+							<p:message for="statusDescript_input" />
+							<p:inputText id="statusDescript_input" required="true"
+								value="#{adminProductStatus.statusDescription}"
+								placeholder="Ingrese descripción del nuevo estado"
+								style="width: 320px"
+								requiredMessage="La descripción del nuevo estado no puede estar vacío" />
+						</p:panelGrid>
+						<br />
+						<f:facet name="footer">
+							<p:commandButton value="Guardar"
+								action="#{adminProductStatus.save}"
+								update="growl dialogGrid estadoProdTbl"
+								oncomplete="handleLoginRequest(xhr, status, args)" />
+						</f:facet>
+					</p:dialog>
+
+				</div>
+			</div>
+
+			<div class="ui-g-12" style="height: 800px">
+				<div class="card">
+					<h1>Estados productos</h1>
+					<p:dataTable var="estadoProducto"
+						value="#{adminProductStatus.listaEstadosProd}" reflow="true"
+						editable="true" rowKey="#{estadoProducto.idEstadoProducto}"
+						paginator="true" rows="10" id="estadoProdTbl">
+						<f:facet name="header">
+                                Estados de producto - estado en la cadena de suministro
+                            </f:facet>
+						<p:ajax event="rowEdit" listener="#{adminProductStatus.onRowEdit}"
+							update=":form:growl" />
+						<p:ajax event="rowEditCancel"
+							listener="#{adminProductStatus.onRowCancel}" update=":form:growl" />
+
+						<p:column headerText="Id estado"
+							sortBy="#{estadoProducto.idEstadoProducto}" style="width:80px">
+							<h:outputText value="#{estadoProducto.idEstadoProducto}" />
+						</p:column>
+
+						<p:column headerText="Descripción estado"
+							sortBy="#{estadoProducto.descripcion}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{estadoProducto.descripcion}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{estadoProducto.descripcion}"
+										style="width:96%" label="Description Producto" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Editar" style="width:35px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

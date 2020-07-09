@@ -1,0 +1,200 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Consulta estado producto</ui:define>
+
+	<ui:define name="head">
+
+	</ui:define>
+
+	<ui:define name="content">
+
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+				console.log(args.infoCorrect);
+				if (!args.infoCorrect) {
+					PF('dlg').jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					PF('dlg').hide();
+				}
+			}
+		</script>
+
+		<style type="text/css">
+.ui-row-editor .ui-row-editor-pencil {
+	margin-left: 8px;
+}
+</style>
+
+		<h:form id="form">
+			<p:growl id="growl" life="2500" />
+
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<p:message for="transactionId_input" />
+					<p:inputText id="transactionId_input" required="true"
+						value="#{productQuery.queryParameter}"
+						requiredMessage="Debe ingresar el id de la etiqueta"
+						placeholder="Ingrese el ID de la etiqueta RFID"
+						style="width: 400px" />
+					<p:commandButton id="query_button" value="Consultar"
+						icon="fa fa-fw fa-search"
+						action="#{productQuery.consultarEstadoProducto}"
+						update="statusBoard growl" style="max-width:150px;" />
+				</div>
+			</div>
+
+			<div class="ui-g-12" style="height: 800px">
+				<p:carousel value="#{productQuery.assetsList}"
+					headerText="Estados del producto" var="asset"
+					itemStyle="text-align:center" responsive="true" id="statusBoard">
+
+					<p:panelGrid columns="2" style="width:100%; margin:10px 0px"
+						columnClasses="label,value" layout="grid"
+						styleClass="ui-panelgrid-blank">
+						<f:facet name="header">
+							<p:graphicImage
+								name="images/status/status_#{asset.metaData.statusId}.png"
+								library="omega-layout" width="100px" height="100px" />
+						</f:facet>
+						<h:outputText style="font-weight: bold;text-align:left;"
+							value="Estado producto:" />
+						<h:outputText style="color:green;font-weight:bold;" value="#{asset.metaData.statusDescription}" />
+
+						<h:outputText style="font-weight: bold;text-align:left;"
+							value="Identificador RFID:" />
+						<h:outputText value="#{asset.productData.idRfidTag}" />
+
+						<h:outputText style="font-weight: bold;text-align:left;"
+							value="Identificador producto:" />
+						<h:outputText value="#{asset.productData.idProduct}" />
+
+						<h:outputText style="font-weight: bold;text-align:left;"
+							value="Nombre producto:" />
+						<h:outputText value="#{asset.productData.productName}" />
+						
+						<h:outputText style="font-weight: bold;text-align:left;"
+							value="Fecha transacción:" />
+						<h:outputText value="#{asset.fechaHora}" />
+
+						<f:facet name="footer">
+							<p:commandButton update=":form:productDetail"
+								style="margin-left:45%;height:40px;width:40px"
+								oncomplete="PF('productDialog').show()" icon="fa fa-fw fa-cubes">
+								<f:setPropertyActionListener value="#{asset}"
+									target="#{productQuery.selectedAsset}" />
+							</p:commandButton>
+						</f:facet>
+					</p:panelGrid>
+
+				</p:carousel>
+			</div>
+
+			<p:dialog header="Info Producto" widgetVar="productDialog"
+				modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+				<p:outputPanel id="productDetail" style="text-align:center;">
+					<p:panelGrid columns="2"
+						rendered="#{not empty productQuery.selectedAsset}"
+						columnClasses="label,value">
+						<f:facet name="header">
+							<p:graphicImage
+								name="images/status/status_#{productQuery.selectedAsset.metaData.statusId}.png"
+								library="omega-layout" height="100px" width="100px" />
+						</f:facet>
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productDescription != null}"
+							value="Descripción producto: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productDescription != null}"
+							value="#{productQuery.selectedAsset.metaData.productDescription}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.statusDescription != null}"
+							value="Estado: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.statusDescription != null}"
+							value="#{productQuery.selectedAsset.metaData.statusDescription}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.location != null}"
+							value="Origen: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.location != null}"
+							value="#{productQuery.selectedAsset.metaData.location}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.orderId != null}"
+							value="Orden de compra No. : " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.orderId != null}"
+							value="#{productQuery.selectedAsset.metaData.orderId}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionDate != null}"
+							value="Fecha transacción: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionDate != null}"
+							value="#{productQuery.selectedAsset.metaData.transactionDate}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionUsername != null}"
+							value="Usuario que realizó la transacción: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionUsername != null}"
+							value="#{productQuery.selectedAsset.metaData.transactionUsername}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionCompany != null}"
+							value="Empresa: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.transactionCompany != null}"
+							value="#{productQuery.selectedAsset.metaData.transactionCompany}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productExpirationDate != null}"
+							value="Fecha vencimiento: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productExpirationDate != null}"
+							value="#{productQuery.selectedAsset.metaData.productExpirationDate}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.vehicleNumber != null}"
+							value="Placa vehículo transporte: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.vehicleNumber != null}"
+							value="#{productQuery.selectedAsset.metaData.vehicleNumber}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.vehicleType != null}"
+							value="Tipo vehículo transporte: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.vehicleType != null}"
+							value="#{productQuery.selectedAsset.metaData.vehicleType}" />
+
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productTemperature != null}"
+							value="Temperatura: " />
+						<h:outputText
+							rendered="#{productQuery.selectedAsset.metaData.productTemperature != null}"
+							value="#{productQuery.selectedAsset.metaData.productTemperature}" />
+
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+
+		<div>
+			Icons made by <a href="https://www.flaticon.com/authors/freepik"
+				title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"
+				title="Flaticon"> www.flaticon.com</a>
+		</div>
+	</ui:define>
+
+</ui:composition>

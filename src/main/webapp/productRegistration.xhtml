@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Registro producto</ui:define>
+
+	<ui:define name="head">
+
+	</ui:define>
+
+	<ui:define name="content">
+
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+				console.log(args.infoCorrect);
+				if (!args.infoCorrect) {
+					PF('dlg').jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					PF('dlg').hide();
+				}
+			}
+			
+			function resetWizard() {
+				   wiz.loadStep(wiz.cfg.steps[0], true);
+				}
+		</script>
+
+		<style type="text/css">
+.ui-row-editor .ui-row-editor-pencil {
+	margin-left: 8px;
+}
+</style>
+
+		<h:form id="form">
+			<p:growl id="growl" life="2500" />
+			<p:panel id="panelWizard">
+				<div class="ui-g">
+					<div class="ui-g-12">
+						<p:tooltip />
+						<p:wizard widgetVar="wiz"
+							flowListener="#{productRegistration.onFlowProcess}"
+							style="height:800px">
+							<p:tab id="EtiquetaRFID" title="Escanear etiqueta RFID">
+								<p:panel header="RFID registro">
+									<p:panelGrid columns="1" layout="grid"
+										columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+										style="border:none; background-color:transparent;">
+										<p:message for="idRfidTag_input" />
+										<p:inputText id="idRfidTag_input" required="true"
+											value="#{productRegistration.asset.productData.idRfidTag}"
+											label="ID de la etiqueta RFID"
+											placeholder="Ingrese o escanee la etiqueta RFID"
+											requiredMessage="El ID de la etiqueta RFID no puede estar vacío"
+											style="width: 320px" />
+										<p:commandButton value="Escanear etiqueta RFID"
+											action="#{productRegistration.escanearEtiquetaRFID}" />
+									</p:panelGrid>
+								</p:panel>
+							</p:tab>
+
+							<p:tab id="blockAsset" title="Información del producto">
+								<p:panel
+									header="Ingrese la información del producto a registrar (sólo primera vez)">
+									<p:panelGrid columns="1" layout="grid"
+										styleClass="ui-panelgrid-blank"
+										columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+										id="assetGrid"
+										style="border:0px none; background-color:transparent;">
+										<p:message for="idProduct_input" />
+										<p:inputText id="idProduct_input" required="true"
+											disabled="#{!productRegistration.editableAsset}"
+											value="#{productRegistration.asset.productData.idProduct}"
+											label="ID del producto"
+											placeholder="Ingrese el id del producto"
+											requiredMessage="El ID del producto no puede estar vacío"
+											style="width: 320px" />
+
+										<p:message for="prodName_input" />
+										<p:inputText id="prodName_input" required="true"
+											disabled="#{!productRegistration.editableAsset}"
+											value="#{productRegistration.asset.productData.productName}"
+											label="Nombre del producto"
+											placeholder="Ingrese el nombre del producto"
+											requiredMessage="El nombre del producto no puede estar vacío"
+											style="width: 320px" />
+
+										<p:message for="productType_input" />
+										<p:inputText id="productType_input" required="true"
+											disabled="#{!productRegistration.editableAsset}"
+											value="#{productRegistration.asset.productData.productType}"
+											label="Tipo de producto"
+											placeholder="Ingrese el tipo de producto"
+											requiredMessage="El tipo de producto no puede estar vacío"
+											style="width: 320px" />
+
+									</p:panelGrid>
+								</p:panel>
+							</p:tab>
+							<p:tab id="blockMetadata" title="Información adicional">
+								<p:panel
+									header="Ingrese nueva información adicional sobre el producto o modificaciones">
+									<p:panelGrid columns="1" layout="grid"
+										styleClass="ui-panelgrid-blank"
+										columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+										id="metaDataGrid"
+										style="border:0px none; background-color:transparent;">
+
+										<p:inputText id="location_input"
+											value="#{productRegistration.asset.metaData.location}"
+											label="Location" placeholder="Ingrese el origen del producto"
+											style="width: 320px" />
+										<p:message for="productStatus" />
+										<p:selectOneMenu id="productStatus"
+											value="#{productRegistration.selectedProductStatus}"
+											required="true"
+											requiredMessage="El estado del producto no puede estar vacío">
+											<f:selectItem itemLabel="Seleccione el estado del producto"
+												itemValue="" />
+											<f:selectItems
+												value="#{productRegistration.listaEstadosProducto}"
+												var="estadoProd" itemLabel="#{estadoProd.descripcion}"
+												itemValue="#{estadoProd.idEstadoProducto}" />
+										</p:selectOneMenu>
+
+										<p:inputText id="order_id_input"
+											value="#{productRegistration.asset.metaData.orderId}"
+											label="Order ID"
+											placeholder="Ingrese el número de orden de compra"
+											style="width: 320px" />
+
+										<p:inputTextarea id="product_description_input" rows="6"
+											cols="33"
+											value="#{productRegistration.asset.metaData.productDescription}"
+											label="Product desccription"
+											placeholder="Ingrese una breve descripción del producto"
+											style="width: 320px" />
+
+										<p:calendar id="popupCalendarProd"
+											value="#{productRegistration.asset.metaData.productExpirationDate}"
+											placeholder="Fecha de vencimiento del producto"
+											pattern="dd-MM-yyyy" style="width: 320px">
+											<f:convertDateTime pattern="dd-MM-yyyy" />
+										</p:calendar>
+
+										<p:inputText id="car_id_input"
+											value="#{productRegistration.asset.metaData.vehicleNumber}"
+											label="Placa de vehículo de transporte"
+											placeholder="Ingrese el número de placa del vehículo de transporte"
+											style="width: 320px" />
+
+										<p:inputText id="car_type_input"
+											value="#{productRegistration.asset.metaData.vehicleType}"
+											label="Ingrese el tipo de vehículo de transporte"
+											placeholder="Ingrese el tipo de vehículo de transporte"
+											style="width: 320px" />
+
+										<p:inputText id="temperature_input"
+											value="#{productRegistration.asset.metaData.productTemperature}"
+											label="Temperatura del producto"
+											placeholder="Ingrese la temperatura del producto"
+											style="width: 320px" />
+									</p:panelGrid>
+									<div>
+										<p:commandButton value="Guardar"
+											style="margin-left: auto; display: block;width:150px;height:40px"
+											action="#{productRegistration.guardarActualizar}"
+											update="growl panelWizard"/>
+									</div>
+								</p:panel>
+
+							</p:tab>
+						</p:wizard>
+
+					</div>
+				</div>
+			</p:panel>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

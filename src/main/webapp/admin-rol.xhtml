@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Administración roles</ui:define>
+
+	<ui:define name="head">
+
+	</ui:define>
+
+	<ui:define name="content">
+
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+				console.log(args.infoCorrect);
+				if (!args.infoCorrect) {
+					PF('dlg').jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					PF('dlg').hide();
+				}
+			}
+		</script>
+
+		<style type="text/css">
+.ui-row-editor .ui-row-editor-pencil {
+	margin-left: 8px;
+}
+</style>
+
+		<h:form id="form">
+			<p:growl id="growl" life="2500" />
+
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<p:tooltip />
+
+					<p:commandButton id="newRol_button" value="Nuevo rol de sistema"
+						icon="fa fa-user-md" type="button" onclick="PF('dlg').show()"
+						style="max-width:150px;" />
+
+
+					<p:dialog header="Agregar nuevo rol" widgetVar="dlg"
+						id="dialogUserRol" resizable="false" draggable="false"
+						responsive="true" width="400px">
+						<p:panelGrid columns="1" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							columnClasses="ui-grid-col-4,ui-grid-col-8" id="dialogGrid">
+							<p:message for="idRol_input" />
+							<p:inputText id="idRol_input" required="true"
+								value="#{adminRolUser.idRol}"
+								placeholder="Ingrese ID del nuevo rol" label="ID rol en sistema"
+								requiredMessage="El ID del nuevo rol no puede estar vacío"
+								style="width: 320px" />
+							<p:message for="rolDescript_input" />
+							<p:inputText id="rolDescript_input" required="true"
+								value="#{adminRolUser.descripcionRol}"
+								placeholder="Ingrese descripción del nuevo rol"
+								style="width: 320px"
+								requiredMessage="La descripción del nuevo rol no puede estar vacío" />
+						</p:panelGrid>
+						<br />
+						<f:facet name="footer">
+							<p:commandButton value="Guardar" action="#{adminRolUser.save}"
+								update="growl dialogGrid rolTable"
+								oncomplete="handleLoginRequest(xhr, status, args)" />
+						</f:facet>
+					</p:dialog>
+
+				</div>
+			</div>
+
+			<div class="ui-g-12" style="height: 800px">
+				<div class="card">
+					<h1>Roles</h1>
+					<p:dataTable var="rolSistema" value="#{adminRolUser.listaRoles}"
+						reflow="true" editable="true" rowKey="#{rolSistema.idRol}"
+						paginator="true" rows="10" id="rolTable">
+						<f:facet name="header">
+                                Roles en el sistema
+                            </f:facet>
+						<p:ajax event="rowEdit" listener="#{adminRolUser.onRowEdit}"
+							update=":form:growl" />
+						<p:ajax event="rowEditCancel" listener="#{adminRolUser.onRowCancel}"
+							update=":form:growl" />
+
+						<p:column headerText="Id rol sistema" sortBy="#{rolSistema.idRol}"
+							style="width:80px">
+							<h:outputText value="#{rolSistema.idRol}" />
+						</p:column>
+
+						<p:column headerText="Descripción rol"
+							sortBy="#{rolSistema.descripcion}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{rolSistema.descripcion}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{rolSistema.descripcion}"
+										style="width:96%" label="Descripción de rol" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Editar" style="width:35px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

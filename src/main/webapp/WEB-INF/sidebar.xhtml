@@ -16,7 +16,7 @@
                 <div class="profile">
                     <p:graphicImage name="images/profile.png" library="omega-layout" />
                     <a id="profile-button" href="#">
-                        <span class="username">Operario</span>
+                        <span class="username"><p:outputLabel value="#{sessionLogin.loggedUser.usuarioLoginPk.idUsuario.nombreUsario}"/> </span>
                         <i class="fa fa-fw fa-cog"></i>
                     </a>
                     <ul>
@@ -31,17 +31,16 @@
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/dashboard"/>
                         <p:submenu id="am_customization" label="Manejo empresas" icon="fa fa-bank">
                             <p:menuitem id="custom1" value="Administrar empresas" icon="fa fa fa-bank" outcome="/admin-empresa.xhtml"/>
-                            <p:menuitem id="custom2" value="Administrar estados producto" icon="fa fa-cube" actionListener="#{guestPreferences.setMenuLayout('overlay')}" ajax="false"/>
+                            <p:menuitem id="custom2" value="Administrar estados producto" icon="fa fa-cube" outcome="/admin-product-status.xhtml"/>
                         </p:submenu>
                         <p:submenu id="om_users" label="Manejo usuarios/rol" icon="fa fa-users">
-                            <p:menuitem id="om_sample" value="Administrar usuarios" icon="fa fa-user" outcome="/sample" />
-                            <p:menuitem id="om_forms" value="Administrar roles" icon="fa fa-user-md" outcome="/messages" />
+                            <p:menuitem id="om_sample" value="Administrar usuarios" icon="fa fa-user" outcome="/admin-usuarios.xhtml" />
+                            <p:menuitem id="om_forms" value="Administrar roles" icon="fa fa-user-md" outcome="/admin-rol.xhtml" />
                         </p:submenu>
                         
                         <p:submenu id="om_trazabilidad" label="Trazabilidad producto" icon="fa fa-chain">
-                            <p:menuitem id="om_new_product" value="Registrar nuevo producto" icon="fa fa-qrcode" outcome="/sample" />
-                            <p:menuitem id="om_query_product" value="Consultar estado producto" icon="fa fa-cubes" outcome="/forms" />
-                            <p:menuitem id="om_add_status" value="Agregar estado producto" icon="fa fa-plus-square" outcome="/data" />
+                            <p:menuitem id="om_new_product" value="Registrar nuevo producto" icon="fa fa-qrcode" outcome="/productRegistration.xhtml" />
+                            <p:menuitem id="om_query_product" value="Consultar estado producto" icon="fa fa-cubes" outcome="/product-query.xhtml" />
                         </p:submenu>
 
 

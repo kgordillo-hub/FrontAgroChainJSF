@@ -14,7 +14,8 @@
 
 		<script type="text/javascript">
 			function handleLoginRequest(xhr, status, args) {
-				if (args.validationFailed || !args.infoCorrect) {
+				console.log(args.infoCorrect);
+				if (!args.infoCorrect) {
 					PF('dlg').jq.effect("shake", {
 						times : 5
 					}, 100);
@@ -24,29 +25,37 @@
 			}
 		</script>
 
-		<h:form>
+		<style type="text/css">
+.ui-row-editor .ui-row-editor-pencil {
+	margin-left: 8px;
+}
+</style>
+
+		<h:form id="form">
+			<p:growl id="growl" life="2500" />
+
 			<div class="ui-g">
 				<div class="ui-g-12">
 					<p:tooltip />
 
-					<p:growl id="growl" showDetail="true" sticky="true" />
 					<p:commandButton id="newCompany_button" value="Nueva empresa"
 						icon="fa fa-bank Fs14 White" type="button"
 						onclick="PF('dlg').show()" style="max-width:150px;" />
 
 
 					<p:dialog header="Agregar empresa" widgetVar="dlg"
-						resizable="false" draggable="false" responsive="true" width="50%">
+						id="dialogEmpresas" resizable="false" draggable="false"
+						responsive="true" width="400px">
 						<p:panelGrid columns="1" layout="grid"
 							styleClass="ui-panelgrid-blank"
-							columnClasses="ui-grid-col-4,ui-grid-col-8">
+							columnClasses="ui-grid-col-4,ui-grid-col-8" id="dialogGrid">
 							<p:message for="idEmpresa_input" />
 							<p:inputText id="idEmpresa_input" required="true"
 								value="#{adminEmpresas.idEmpresa}"
 								placeholder="Ingrese ID de la empresa" label="ID empresa"
 								requiredMessage="El id de la empresa no puede estar vacío"
 								style="width: 320px" />
-							<p:message for="idEmpresa_input" />
+							<p:message for="nombreEmpresa_input" />
 							<p:inputText id="nombreEmpresa_input" required="true"
 								value="#{adminEmpresas.nombreEmpresa}"
 								placeholder="Ingrese nombre de la empresa" style="width: 320px"
@@ -65,10 +74,75 @@
 						<br />
 						<f:facet name="footer">
 							<p:commandButton value="Guardar" action="#{adminEmpresas.save}"
-								update="growl" oncomplete="handleLoginRequest(xhr, status, args)" />
+								update="growl dialogGrid tblEmpresas"
+								oncomplete="handleLoginRequest(xhr, status, args)" />
 						</f:facet>
 					</p:dialog>
 
+				</div>
+			</div>
+
+			<div class="ui-g-12" style="height: 800px">
+				<div class="card">
+					<h1>Empresas</h1>
+					<p:dataTable var="empresa" value="#{adminEmpresas.listaEmpresas}"
+						reflow="true" editable="true" rowKey="#{empresa.idEmpresa}"
+						paginator="true" rows="10" id="tblEmpresas">
+						<f:facet name="header">
+                                Empresas registradas a la fecha
+                            </f:facet>
+						<p:ajax event="rowEdit" listener="#{adminEmpresas.onRowEdit}"
+							update=":form:growl" />
+						<p:ajax event="rowEditCancel"
+							listener="#{adminEmpresas.onRowCancel}" update=":form:growl" />
+
+						<p:column headerText="Id empresa" sortBy="#{empresa.idEmpresa}">
+							<h:outputText value="#{empresa.idEmpresa}" />
+						</p:column>
+
+						<p:column headerText="Nombre empresa"
+							sortBy="#{empresa.nombreEmpresa}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{empresa.nombreEmpresa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{empresa.nombreEmpresa}" style="width:96%"
+										label="NombreEmpresa" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Razón social"
+							sortBy="#{empresa.razonSocialEmpresa}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{empresa.razonSocialEmpresa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{empresa.razonSocialEmpresa}"
+										style="width:96%" label="Razon Social Empresa" />
+								</f:facet>
+							</p:cellEditor>
+
+						</p:column>
+
+						<p:column headerText="Dirección">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{empresa.direccionPrincipal}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{empresa.direccionPrincipal}"
+										style="width:96%" label="Dirección Empresa" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Editar" style="width:35px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
 				</div>
 			</div>
 		</h:form>
